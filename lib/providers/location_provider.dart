@@ -1,12 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/location_model.dart';
 
+final locationsLoadingProvider = StateProvider<bool>((ref) => true);
+
 class LocationNotifier extends StateNotifier<List<LocationModel>> {
-  LocationNotifier() : super([]) {
+  LocationNotifier(this._ref) : super([]) {
     _loadMockData();
   }
 
-  void _loadMockData() {
+  final Ref _ref;
+
+  Future<void> _loadMockData() async {
+    await Future.delayed(const Duration(milliseconds: 400));
     state = [
       LocationModel(
         name: 'Trabalho',
@@ -24,6 +29,7 @@ class LocationNotifier extends StateNotifier<List<LocationModel>> {
         isActive: false,
       ),
     ];
+    _ref.read(locationsLoadingProvider.notifier).state = false;
   }
 
   void addLocation(LocationModel location) {
@@ -45,5 +51,5 @@ class LocationNotifier extends StateNotifier<List<LocationModel>> {
 }
 
 final locationProvider = StateNotifierProvider<LocationNotifier, List<LocationModel>>((ref) {
-  return LocationNotifier();
+  return LocationNotifier(ref);
 });
