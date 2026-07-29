@@ -1,11 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/skeleton.dart';
 
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+class ArrivalEntry {
+  final String title;
+  final String subtitle;
+
+  const ArrivalEntry({required this.title, required this.subtitle});
+}
+
+const _defaultArrivals = [
+  ArrivalEntry(title: 'Trabalho', subtitle: 'Chegou hoje às 08:45'),
+  ArrivalEntry(title: 'Casa', subtitle: 'Chegou ontem às 18:30'),
+];
+
+class HomeScreen extends ConsumerStatefulWidget {
+  final List<ArrivalEntry>? arrivals;
+
+  const HomeScreen({super.key, this.arrivals});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _isLoading = true;
+  List<ArrivalEntry> _arrivals = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final result = widget.arrivals ?? await _fetchArrivals();
+    if (!mounted) return;
+
+    // Ensure loading state is visible before showing data when arrivals are injected
+    if (widget.arrivals != null) {
+      await Future.delayed(Duration.zero);
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _arrivals = result;
+      _isLoading = false;
+    });
+  }
+
+  Future<List<ArrivalEntry>> _fetchArrivals() async {
+    await Future.delayed(const Duration(milliseconds: 400));
+    return _defaultArrivals;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ToAqui', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -24,14 +75,14 @@ class HomeScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
                     children: [
-                      Icon(Icons.shield, size: 48, color: Theme.of(context).colorScheme.primary),
+                      const Text('🏡', style: TextStyle(fontSize: 40)),
                       const SizedBox(height: 16),
                       Text(
                         'Rastreamento Ativo',
                         style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                        ),
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.bold,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -49,32 +100,38 @@ class HomeScreen extends ConsumerWidget {
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              Expanded(
-                child: ListView(
-                  children: const [
-                    ListTile(
-                      leading: CircleAvatar(
-                        child: Icon(Icons.check, color: Colors.green),
-                        backgroundColor: Colors.greenAccent,
-                      ),
-                      title: Text('Trabalho'),
-                      subtitle: Text('Chegou hoje às 08:45'),
-                    ),
-                    ListTile(
-                      leading: CircleAvatar(
-                        child: Icon(Icons.check, color: Colors.green),
-                        backgroundColor: Colors.greenAccent,
-                      ),
-                      title: Text('Casa'),
-                      subtitle: Text('Chegou ontem às 18:30'),
-                    ),
-                  ],
-                ),
-              ),
+              Expanded(child: _buildBody(context)),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBody(BuildContext context) {
+    if (_isLoading) {
+      return ListView(
+        children: const [SkeletonListTile(), SkeletonListTile()],
+      );
+    }
+    if (_arrivals.isEmpty) {
+      return const EmptyState(
+        emoji: '📭',
+        title: 'Nenhuma chegada registrada ainda',
+        subtitle: 'Quando você chegar a um local salvo, ele aparece aqui',
+      );
+    }
+    return ListView(
+      children: _arrivals
+          .map((entry) => ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+                  child: Icon(Icons.check, color: Theme.of(context).colorScheme.secondary),
+                ),
+                title: Text(entry.title),
+                subtitle: Text(entry.subtitle),
+              ))
+          .toList(),
     );
   }
 }
