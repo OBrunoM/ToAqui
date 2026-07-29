@@ -45,7 +45,10 @@ class EmptyState extends StatelessWidget {
               const SizedBox(height: 18),
               FilledButton(
                 onPressed: onCtaPressed,
-                style: FilledButton.styleFrom(backgroundColor: colorScheme.secondary),
+                style: FilledButton.styleFrom(
+                  backgroundColor: colorScheme.secondary,
+                  foregroundColor: colorScheme.onSecondary,
+                ),
                 child: Text(ctaLabel!),
               ),
             ],
