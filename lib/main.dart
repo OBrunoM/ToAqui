@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 // import 'package:firebase_core/firebase_core.dart';
 // import 'firebase_options.dart';
 
+import 'theme/app_theme.dart';
 import 'screens/home_screen.dart';
 import 'screens/main_layout.dart';
 import 'screens/locations_screen.dart';
@@ -65,20 +66,8 @@ class ToAquiApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'ToAqui',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF00B4D8), // Cyan/Blue theme
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF00B4D8),
-          brightness: Brightness.dark,
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
       themeMode: ThemeMode.system,
       routerConfig: router,
     );
