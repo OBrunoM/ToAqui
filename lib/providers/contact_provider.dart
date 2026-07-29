@@ -8,7 +8,7 @@ class ContactNotifier extends StateNotifier<List<ContactModel>> {
 
   void _loadMockData() {
     state = [
-      ContactModel(name: 'Mãe', relationship: 'Mãe'),
+      ContactModel(name: 'Mãe', relationship: 'Recebe notificações'),
       ContactModel(name: 'Amor', relationship: 'Parceiro(a)'),
     ];
   }
