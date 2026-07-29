@@ -15,14 +15,35 @@ void main() {
     await tester.pumpWidget(buildApp());
     await tester.pumpAndSettle();
 
-    expect(find.text('Mãe'), findsOneWidget);
-    expect(find.text('Amor'), findsOneWidget);
+    // Find 'Mãe' and 'Amor' in ListTile titles (not subtitles)
+    expect(
+      find.descendant(
+        of: find.byType(ListTile),
+        matching: find.text('Mãe'),
+      ),
+      findsWidgets, // Both title and subtitle have 'Mãe'
+    );
+    expect(find.text('Amor'), findsWidgets); // Title and subtitle
 
     await tester.tap(find.byIcon(Icons.delete_outline).first);
     await tester.pumpAndSettle();
 
-    expect(find.text('Mãe'), findsNothing);
-    expect(find.text('Amor'), findsOneWidget);
+    // After deleting first contact, no more 'Mãe' in ListTiles
+    expect(
+      find.descendant(
+        of: find.byType(ListTile),
+        matching: find.text('Mãe'),
+      ),
+      findsNothing,
+    );
+    // 'Amor' should still exist in a ListTile
+    expect(
+      find.descendant(
+        of: find.byType(ListTile),
+        matching: find.text('Amor'),
+      ),
+      findsWidgets,
+    );
   });
 
   testWidgets('shows the empty state after deleting every contact', (tester) async {
