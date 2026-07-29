@@ -46,3 +46,6 @@ app.*.map.json
 
 # Superpowers brainstorming companion mockups
 .superpowers/
+
+# Superpowers isolated worktrees
+.worktrees/
