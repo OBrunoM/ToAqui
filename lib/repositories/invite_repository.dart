@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/invite_model.dart';
+import './contact_repository.dart';
 
 const _codeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
@@ -66,12 +67,7 @@ class InviteRepository {
       return InviteRedeemFailure(InviteFailureReason.expired);
     }
 
-    await _firestore
-        .collection('users')
-        .doc(invite.ownerUid)
-        .collection('contacts')
-        .doc(invite.contactId)
-        .update({'linkedUid': redeemerUid});
+    await ContactRepository(_firestore, invite.ownerUid).linkContact(invite.contactId, redeemerUid);
     await _collection.doc(code).update({'used': true});
 
     return InviteRedeemSuccess(invite.contactId, invite.ownerUid);
