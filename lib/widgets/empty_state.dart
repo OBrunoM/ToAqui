@@ -47,7 +47,7 @@ class EmptyState extends StatelessWidget {
                 onPressed: onCtaPressed,
                 style: FilledButton.styleFrom(
                   backgroundColor: colorScheme.secondary,
-                  foregroundColor: colorScheme.onSecondary,
+                  foregroundColor: Colors.black87,
                 ),
                 child: Text(ctaLabel!),
               ),

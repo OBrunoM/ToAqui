@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/location_provider.dart';
 import '../models/location_model.dart';
+import '../widgets/app_snackbar.dart';
 
 class AddLocationScreen extends ConsumerStatefulWidget {
   const AddLocationScreen({super.key});
@@ -32,9 +33,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
 
   void _saveLocation() {
     if (_selectedLocation == null || _nameController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecione um local no mapa e dê um nome.')),
-      );
+      AppSnackbar.showError(context, 'Selecione um local no mapa e dê um nome.');
       return;
     }
 
