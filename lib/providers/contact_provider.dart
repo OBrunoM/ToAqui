@@ -1,27 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/contact_model.dart';
+import '../repositories/contact_repository.dart';
+import 'auth_provider.dart';
 
-class ContactNotifier extends StateNotifier<List<ContactModel>> {
-  ContactNotifier() : super([]) {
-    _loadMockData();
-  }
+final contactRepositoryProvider = Provider<ContactRepository>((ref) {
+  return ContactRepository(FirebaseFirestore.instance, ref.watch(currentUidProvider));
+});
 
-  void _loadMockData() {
-    state = [
-      ContactModel(name: 'Mãe', relationship: 'Mãe'),
-      ContactModel(name: 'Amor', relationship: 'Parceiro(a)'),
-    ];
-  }
-
-  void addContact(ContactModel contact) {
-    state = [...state, contact];
-  }
-
-  void deleteContact(String id) {
-    state = state.where((c) => c.id != id).toList();
-  }
-}
-
-final contactProvider = StateNotifierProvider<ContactNotifier, List<ContactModel>>((ref) {
-  return ContactNotifier();
+final contactsStreamProvider = StreamProvider((ref) {
+  return ref.watch(contactRepositoryProvider).watchContacts();
 });
