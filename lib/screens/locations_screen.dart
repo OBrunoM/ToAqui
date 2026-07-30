@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../providers/auth_provider.dart';
+import '../providers/firestore_provider.dart';
 import '../providers/location_provider.dart';
+import '../repositories/arrival_repository.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton.dart';
 import '../widgets/app_snackbar.dart';
@@ -36,15 +39,32 @@ class LocationsScreen extends ConsumerWidget {
                 leading: const CircleAvatar(child: Icon(Icons.place)),
                 title: Text(loc.name),
                 subtitle: Text('Raio: ${loc.radius.toInt()}m'),
-                trailing: Switch(
-                  value: loc.isActive,
-                  onChanged: (val) {
-                    ref.read(locationRepositoryProvider).toggleLocation(loc.id, val);
-                    AppSnackbar.showConfirmation(
-                      context,
-                      '${loc.name} ${val ? 'ativado' : 'desativado'}',
-                    );
-                  },
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.notifications_active),
+                      tooltip: 'Simular chegada',
+                      onPressed: () {
+                        ArrivalRepository(ref.read(firestoreProvider)).recordArrival(
+                          ownerUid: ref.read(currentUidProvider),
+                          locationId: loc.id,
+                          message: loc.message,
+                        );
+                        AppSnackbar.showConfirmation(context, 'Chegada simulada em ${loc.name}!');
+                      },
+                    ),
+                    Switch(
+                      value: loc.isActive,
+                      onChanged: (val) {
+                        ref.read(locationRepositoryProvider).toggleLocation(loc.id, val);
+                        AppSnackbar.showConfirmation(
+                          context,
+                          '${loc.name} ${val ? 'ativado' : 'desativado'}',
+                        );
+                      },
+                    ),
+                  ],
                 ),
               );
             },
