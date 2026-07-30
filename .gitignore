@@ -49,3 +49,6 @@ app.*.map.json
 
 # Superpowers isolated worktrees
 .worktrees/
+
+# Claude Code local settings (machine-specific permissions)
+.claude/
