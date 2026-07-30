@@ -10,6 +10,7 @@ import 'screens/main_layout.dart';
 import 'screens/locations_screen.dart';
 import 'screens/contacts_screen.dart';
 import 'screens/add_location_screen.dart';
+import 'screens/join_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +52,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/locations/add',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AddLocationScreen(),
+      ),
+      GoRoute(
+        path: '/join',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const JoinScreen(),
       ),
     ],
   );

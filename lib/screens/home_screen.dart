@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton.dart';
 
@@ -68,6 +69,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.link),
+            tooltip: 'Tenho um convite',
+            onPressed: () => context.push('/join'),
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
