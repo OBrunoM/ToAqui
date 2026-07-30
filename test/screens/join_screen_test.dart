@@ -35,7 +35,7 @@ void main() {
     expect(find.textContaining('Conectado'), findsOneWidget);
   });
 
-  testWidgets('an invalid code shows an error', (tester) async {
+  testWidgets('an unknown code shows a not-found error', (tester) async {
     await tester.pumpWidget(ProviderScope(
       overrides: [
         currentUidProvider.overrideWithValue('family-uid'),
@@ -49,5 +49,60 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.textContaining('não encontrado'), findsOneWidget);
+  });
+
+  testWidgets('an already-used code shows an already-used error', (tester) async {
+    final firestore = FakeFirebaseFirestore();
+    final contacts = ContactRepository(firestore, 'owner-uid');
+    final contact = ContactModel(name: 'Vovó', relationship: 'Avó');
+    await contacts.addContact(contact);
+    final code = await InviteRepository(firestore).createInvite(
+      ownerUid: 'owner-uid',
+      contactId: contact.id,
+    );
+    await InviteRepository(firestore).redeemInvite(code: code, redeemerUid: 'first-redeemer');
+
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        currentUidProvider.overrideWithValue('family-uid'),
+        firestoreProvider.overrideWithValue(firestore),
+      ],
+      child: const MaterialApp(home: JoinScreen()),
+    ));
+
+    await tester.enterText(find.byKey(const Key('invite-code-field')), code);
+    await tester.tap(find.byKey(const Key('join-submit-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.textContaining('já foi usado'), findsOneWidget);
+  });
+
+  testWidgets('an expired code shows an expired error', (tester) async {
+    final firestore = FakeFirebaseFirestore();
+    final contacts = ContactRepository(firestore, 'owner-uid');
+    final contact = ContactModel(name: 'Vovó', relationship: 'Avó');
+    await contacts.addContact(contact);
+    final code = await InviteRepository(firestore).createInvite(
+      ownerUid: 'owner-uid',
+      contactId: contact.id,
+      now: DateTime.now().subtract(const Duration(hours: 25)),
+    );
+
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        currentUidProvider.overrideWithValue('family-uid'),
+        firestoreProvider.overrideWithValue(firestore),
+      ],
+      child: const MaterialApp(home: JoinScreen()),
+    ));
+
+    await tester.enterText(find.byKey(const Key('invite-code-field')), code);
+    await tester.tap(find.byKey(const Key('join-submit-button')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.textContaining('expirou'), findsOneWidget);
   });
 }
