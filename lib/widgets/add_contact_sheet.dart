@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/contact_model.dart';
 import '../providers/contact_provider.dart';
+import '../providers/auth_provider.dart';
+import '../repositories/invite_repository.dart';
+import '../providers/firestore_provider.dart';
 
-void showAddContactSheet(BuildContext context) {
-  showModalBottomSheet(
+Future<String?> showAddContactSheet(BuildContext context) {
+  return showModalBottomSheet<String?>(
     context: context,
     isScrollControlled: true,
     builder: (context) => const AddContactSheet(),
@@ -22,6 +25,7 @@ class _AddContactSheetState extends ConsumerState<AddContactSheet> {
   final _nameController = TextEditingController();
   final _relationshipController = TextEditingController();
   bool _canSave = false;
+  bool _saving = false;
 
   @override
   void dispose() {
@@ -30,15 +34,24 @@ class _AddContactSheetState extends ConsumerState<AddContactSheet> {
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
+    setState(() => _saving = true);
+
     final relationship = _relationshipController.text.isNotEmpty
         ? _relationshipController.text
         : 'Familiar';
+    final contact = ContactModel(name: _nameController.text, relationship: relationship);
 
-    ref.read(contactProvider.notifier).addContact(
-          ContactModel(name: _nameController.text, relationship: relationship),
-        );
-    Navigator.of(context).pop();
+    await ref.read(contactRepositoryProvider).addContact(contact);
+
+    final invites = InviteRepository(ref.read(firestoreProvider));
+    final code = await invites.createInvite(
+      ownerUid: ref.read(currentUidProvider),
+      contactId: contact.id,
+    );
+
+    if (!mounted) return;
+    Navigator.of(context).pop(code);
   }
 
   @override
@@ -77,8 +90,14 @@ class _AddContactSheetState extends ConsumerState<AddContactSheet> {
           const SizedBox(height: 20),
           FilledButton(
             key: const Key('contact-save-button'),
-            onPressed: _canSave ? _save : null,
-            child: const Text('Salvar'),
+            onPressed: (_canSave && !_saving) ? _save : null,
+            child: _saving
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Salvar'),
           ),
         ],
       ),
