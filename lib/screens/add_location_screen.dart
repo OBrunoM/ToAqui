@@ -47,7 +47,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
           : 'Cheguei em ${_nameController.text} em segurança!',
     );
 
-    ref.read(locationProvider.notifier).addLocation(newLocation);
+    ref.read(locationRepositoryProvider).addLocation(newLocation);
     context.pop();
   }
 
