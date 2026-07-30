@@ -5,6 +5,7 @@ import '../providers/contact_provider.dart';
 import '../providers/auth_provider.dart';
 import '../repositories/invite_repository.dart';
 import '../providers/firestore_provider.dart';
+import '../widgets/app_snackbar.dart';
 
 Future<String?> showAddContactSheet(BuildContext context) {
   return showModalBottomSheet<String?>(
@@ -37,21 +38,27 @@ class _AddContactSheetState extends ConsumerState<AddContactSheet> {
   Future<void> _save() async {
     setState(() => _saving = true);
 
-    final relationship = _relationshipController.text.isNotEmpty
-        ? _relationshipController.text
-        : 'Familiar';
-    final contact = ContactModel(name: _nameController.text, relationship: relationship);
+    try {
+      final relationship = _relationshipController.text.isNotEmpty
+          ? _relationshipController.text
+          : 'Familiar';
+      final contact = ContactModel(name: _nameController.text, relationship: relationship);
 
-    await ref.read(contactRepositoryProvider).addContact(contact);
+      await ref.read(contactRepositoryProvider).addContact(contact);
 
-    final invites = InviteRepository(ref.read(firestoreProvider));
-    final code = await invites.createInvite(
-      ownerUid: ref.read(currentUidProvider),
-      contactId: contact.id,
-    );
+      final invites = InviteRepository(ref.read(firestoreProvider));
+      final code = await invites.createInvite(
+        ownerUid: ref.read(currentUidProvider),
+        contactId: contact.id,
+      );
 
-    if (!mounted) return;
-    Navigator.of(context).pop(code);
+      if (!mounted) return;
+      Navigator.of(context).pop(code);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      AppSnackbar.showError(context, 'Não foi possível salvar. Tente de novo.');
+    }
   }
 
   @override

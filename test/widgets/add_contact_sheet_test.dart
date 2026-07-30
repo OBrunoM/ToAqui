@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:to_aqui/providers/auth_provider.dart';
 import 'package:to_aqui/providers/contact_provider.dart';
+import 'package:to_aqui/providers/firestore_provider.dart';
 import 'package:to_aqui/repositories/invite_repository.dart';
 import 'package:to_aqui/widgets/add_contact_sheet.dart';
 
