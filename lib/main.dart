@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,7 +24,9 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   final uid = await AuthService(FirebaseAuth.instance).signInAnonymously();
-  await FcmService(FirebaseFirestore.instance).registerToken(uid);
+  // Fire-and-forget: push registration (incl. the browser permission prompt
+  // on web) must never block the UI from appearing.
+  unawaited(FcmService(FirebaseFirestore.instance).registerToken(uid));
   runApp(const ProviderScope(child: ToAquiApp()));
 }
 

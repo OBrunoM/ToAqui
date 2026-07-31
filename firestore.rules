@@ -1,0 +1,42 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      match /locations/{locationId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      match /contacts/{contactId} {
+        allow read, create, delete: if request.auth != null && request.auth.uid == uid;
+        allow update: if request.auth != null && (
+          request.auth.uid == uid ||
+          (
+            resource.data.linkedUid == null &&
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['linkedUid'])
+          )
+        );
+      }
+    }
+
+    match /invites/{code} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerUid;
+      allow update: if request.auth != null &&
+        resource.data.used == false &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['used']) &&
+        request.resource.data.used == true;
+    }
+
+    match /arrivals/{arrivalId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerUid;
+    }
+
+    match /emergencies/{emergencyId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerUid;
+    }
+  }
+}
