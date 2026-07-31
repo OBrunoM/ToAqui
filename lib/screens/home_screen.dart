@@ -135,10 +135,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
     if (_arrivals.isEmpty) {
-      return const EmptyState(
-        emoji: '📭',
-        title: 'Nenhuma chegada registrada ainda',
-        subtitle: 'Quando você chegar a um local salvo, ele aparece aqui',
+      return const SizedBox(
+        height: 280,
+        child: EmptyState(
+          emoji: '📭',
+          title: 'Nenhuma chegada registrada ainda',
+          subtitle: 'Quando você chegar a um local salvo, ele aparece aqui',
+        ),
       );
     }
     return ListView(
