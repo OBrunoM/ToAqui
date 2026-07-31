@@ -68,5 +68,7 @@
 		</array>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>O ToAqui usa sua localização para incluir no alerta de emergência quando você aciona o botão.</string>
 	</dict>
 </plist>
