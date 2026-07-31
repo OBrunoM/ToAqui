@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton.dart';
+import '../widgets/emergency_button.dart';
 
 class ArrivalEntry {
   final String title;
@@ -78,7 +79,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -109,13 +110,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   ),
                 ),
               ),
+              const SizedBox(height: 16),
+              const Center(child: EmergencyButton()),
               const SizedBox(height: 24),
               Text(
                 'Últimos Envios',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              Expanded(child: _buildBody(context)),
+              _buildBody(context),
             ],
           ),
         ),
@@ -126,6 +129,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget _buildBody(BuildContext context) {
     if (_isLoading) {
       return ListView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
         children: const [SkeletonListTile(), SkeletonListTile()],
       );
     }
@@ -137,6 +142,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       );
     }
     return ListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       children: _arrivals
           .map((entry) => ListTile(
                 leading: CircleAvatar(
