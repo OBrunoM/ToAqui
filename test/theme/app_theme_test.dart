@@ -19,4 +19,11 @@ void main() {
     expect(theme.colorScheme.secondary, AppColors.coral);
     expect(theme.colorScheme.brightness, Brightness.dark);
   });
+
+  test('exposes a card radius token and a two-color teal hero gradient', () {
+    expect(AppRadius.card, 20.0);
+    expect(AppShadows.soft, isNotEmpty);
+    expect(AppTheme.heroGradient.colors, hasLength(2));
+    expect(AppTheme.heroGradient.colors.last, AppColors.teal);
+  });
 }

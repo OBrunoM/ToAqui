@@ -6,7 +6,27 @@ class AppColors {
   static const cream = Color(0xFFF7F3ED);
 }
 
+class AppRadius {
+  static const card = 20.0;
+}
+
+class AppShadows {
+  static List<BoxShadow> soft = [
+    BoxShadow(
+      color: Colors.black.withOpacity(0.12),
+      blurRadius: 16,
+      offset: const Offset(0, 4),
+    ),
+  ];
+}
+
 class AppTheme {
+  static const heroGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF1F7A6E), AppColors.teal],
+  );
+
   static ThemeData light() {
     return ThemeData(
       useMaterial3: true,
