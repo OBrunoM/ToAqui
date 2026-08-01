@@ -16,6 +16,8 @@ class AddLocationScreen extends ConsumerStatefulWidget {
 class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
   LatLng? _selectedLocation;
   double _radius = 100;
+  String _selectedIcon = '📍';
+  static const _iconChoices = ['📍', '🏠', '🏢', '🎓', '🏥', '🛒'];
   final _nameController = TextEditingController();
   final _messageController = TextEditingController();
 
@@ -45,6 +47,7 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
       message: _messageController.text.isNotEmpty
           ? _messageController.text
           : 'Cheguei em ${_nameController.text} em segurança!',
+      icon: _selectedIcon,
     );
 
     ref.read(locationRepositoryProvider).addLocation(newLocation);
@@ -151,6 +154,20 @@ class _AddLocationScreenState extends ConsumerState<AddLocationScreen> {
                       onChanged: (val) => setState(() => _radius = val),
                     ),
                     const SizedBox(height: 8),
+                    const Text('Ícone'),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 8,
+                      children: _iconChoices.map((icon) {
+                        final selected = icon == _selectedIcon;
+                        return ChoiceChip(
+                          label: Text(icon, style: const TextStyle(fontSize: 20)),
+                          selected: selected,
+                          onSelected: (_) => setState(() => _selectedIcon = icon),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
                     TextField(
                       controller: _messageController,
                       decoration: const InputDecoration(

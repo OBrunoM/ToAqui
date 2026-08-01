@@ -8,6 +8,7 @@ class LocationModel {
   final double radius; // em metros
   final String message;
   final bool isActive;
+  final String icon;
 
   LocationModel({
     String? id,
@@ -17,6 +18,7 @@ class LocationModel {
     required this.radius,
     required this.message,
     this.isActive = true,
+    this.icon = '📍',
   }) : id = id ?? const Uuid().v4();
 
   LocationModel copyWith({
@@ -26,6 +28,7 @@ class LocationModel {
     double? radius,
     String? message,
     bool? isActive,
+    String? icon,
   }) {
     return LocationModel(
       id: id,
@@ -35,6 +38,7 @@ class LocationModel {
       radius: radius ?? this.radius,
       message: message ?? this.message,
       isActive: isActive ?? this.isActive,
+      icon: icon ?? this.icon,
     );
   }
 
@@ -47,6 +51,7 @@ class LocationModel {
       'radius': radius,
       'message': message,
       'isActive': isActive,
+      'icon': icon,
     };
   }
 
@@ -59,6 +64,7 @@ class LocationModel {
       radius: map['radius'],
       message: map['message'],
       isActive: map['isActive'],
+      icon: map['icon'] ?? '📍',
     );
   }
 }

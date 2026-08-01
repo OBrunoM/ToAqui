@@ -73,4 +73,32 @@ void main() {
 
     expect(await repo.watchLocations().first, isEmpty);
   });
+
+  test('addLocation persists a custom icon', () async {
+    await repo.addLocation(LocationModel(
+      name: 'Escritório',
+      latitude: 0,
+      longitude: 0,
+      radius: 50,
+      message: 'x',
+      icon: '🏢',
+    ));
+
+    final result = await repo.watchLocations().first;
+    expect(result.single.icon, '🏢');
+  });
+
+  test('fromMap defaults icon to a pin for documents saved before the field existed', () {
+    final location = LocationModel.fromMap({
+      'id': 'loc-1',
+      'name': 'Antigo',
+      'latitude': 0.0,
+      'longitude': 0.0,
+      'radius': 50.0,
+      'message': 'x',
+      'isActive': true,
+    });
+
+    expect(location.icon, '📍');
+  });
 }
