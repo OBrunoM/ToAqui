@@ -21,4 +21,19 @@ void main() {
     expect(data['message'], 'Cheguei em segurança!');
     expect(data['createdAt'], isNotNull);
   });
+
+  test('watchArrivals only returns arrivals for the given owner', () async {
+    final firestore = FakeFirebaseFirestore();
+    final repo = ArrivalRepository(firestore);
+
+    await repo.recordArrival(ownerUid: 'owner-uid', locationId: 'loc-1', message: 'Cheguei em casa!');
+    await repo.recordArrival(ownerUid: 'owner-uid', locationId: 'loc-2', message: 'Cheguei no trabalho!');
+    await repo.recordArrival(ownerUid: 'other-uid', locationId: 'loc-3', message: 'Não deveria aparecer');
+
+    final result = await repo.watchArrivals('owner-uid').first;
+
+    expect(result, hasLength(2));
+    expect(result.map((a) => a.locationId), containsAll(['loc-1', 'loc-2']));
+    expect(result.every((a) => a.locationId != 'loc-3'), isTrue);
+  });
 }

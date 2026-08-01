@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../models/arrival_record.dart';
+
 class ArrivalRepository {
   ArrivalRepository(this._firestore);
 
@@ -16,5 +18,15 @@ class ArrivalRepository {
       'message': message,
       'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  Stream<List<ArrivalRecord>> watchArrivals(String ownerUid) {
+    return _firestore
+        .collection('arrivals')
+        .where('ownerUid', isEqualTo: ownerUid)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => ArrivalRecord.fromMap(doc.id, doc.data())).toList());
   }
 }
