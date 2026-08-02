@@ -125,31 +125,52 @@ class _EmergencyButtonState extends ConsumerState<EmergencyButton> with SingleTi
       child: AnimatedBuilder(
         animation: _holdController,
         builder: (context, _) {
-          return Stack(
-            alignment: Alignment.center,
-            children: [
-              SizedBox(
-                width: 72,
-                height: 72,
-                child: CircularProgressIndicator(
-                  value: _holdController.value,
-                  strokeWidth: 4,
-                  color: coral,
-                  backgroundColor: coral.withOpacity(0.2),
-                ),
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: SizedBox(
+              width: double.infinity,
+              height: 72,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Container(color: coral),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: _holdController.value,
+                      heightFactor: 1,
+                      child: Container(color: Colors.white.withOpacity(0.25)),
+                    ),
+                  ),
+                  Center(
+                    child: _sending
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(Icons.sos, color: Colors.white, size: 20),
+                              Text(
+                                'SOS',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              Text(
+                                'Pressione por 3 segundos',
+                                style: TextStyle(color: Colors.white, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                  ),
+                ],
               ),
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: coral),
-                child: _sending
-                    ? const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                      )
-                    : const Icon(Icons.sos, color: Colors.white, size: 32),
-              ),
-            ],
+            ),
           );
         },
       ),
