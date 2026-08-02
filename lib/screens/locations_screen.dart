@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../providers/auth_provider.dart';
-import '../providers/firestore_provider.dart';
+import '../providers/arrival_provider.dart';
 import '../providers/location_provider.dart';
-import '../repositories/arrival_repository.dart';
 import '../models/location_model.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/skeleton.dart';
@@ -100,7 +99,7 @@ class _LocationList extends ConsumerWidget {
                 PopupMenuButton<String>(
                   onSelected: (value) {
                     if (value == 'simulate') {
-                      ArrivalRepository(ref.read(firestoreProvider)).recordArrival(
+                      ref.read(arrivalRepositoryProvider).recordArrival(
                         ownerUid: ref.read(currentUidProvider),
                         locationId: loc.id,
                         message: loc.message,

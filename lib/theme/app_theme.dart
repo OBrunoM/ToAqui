@@ -37,6 +37,9 @@ class AppTheme {
         primary: AppColors.teal,
         secondary: AppColors.coral,
       ),
+      cardTheme: CardThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
+      ),
     );
   }
 
@@ -48,6 +51,9 @@ class AppTheme {
         brightness: Brightness.dark,
         primary: AppColors.teal,
         secondary: AppColors.coral,
+      ),
+      cardTheme: CardThemeData(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.card)),
       ),
     );
   }
