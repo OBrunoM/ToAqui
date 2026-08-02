@@ -1,34 +1,50 @@
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:to_aqui/models/location_model.dart';
+import 'package:to_aqui/providers/auth_provider.dart';
+import 'package:to_aqui/providers/firestore_provider.dart';
+import 'package:to_aqui/repositories/arrival_repository.dart';
+import 'package:to_aqui/repositories/location_repository.dart';
 import 'package:to_aqui/screens/home_screen.dart';
-import 'package:to_aqui/widgets/skeleton.dart';
 
 void main() {
-  testWidgets('shows skeletons, then the injected arrivals', (tester) async {
-    await tester.pumpWidget(ProviderScope(
-      child: MaterialApp(
-        home: HomeScreen(
-          arrivals: const [ArrivalEntry(title: 'Trabalho', subtitle: 'Chegou hoje às 08:45')],
-        ),
-      ),
-    ));
-
-    expect(find.byType(SkeletonListTile), findsWidgets);
-
-    await tester.pumpAndSettle();
-
-    expect(find.byType(SkeletonListTile), findsNothing);
-    expect(find.text('Trabalho'), findsOneWidget);
-  });
+  Widget buildApp(FakeFirebaseFirestore firestore) {
+    return ProviderScope(
+      overrides: [
+        currentUidProvider.overrideWithValue('owner-uid'),
+        firestoreProvider.overrideWithValue(firestore),
+      ],
+      child: const MaterialApp(home: HomeScreen()),
+    );
+  }
 
   testWidgets('shows the empty state when there are no arrivals', (tester) async {
-    await tester.pumpWidget(const ProviderScope(
-      child: MaterialApp(home: HomeScreen(arrivals: [])),
-    ));
-
+    await tester.pumpWidget(buildApp(FakeFirebaseFirestore()));
     await tester.pumpAndSettle();
 
-    expect(find.text('Nenhuma chegada registrada ainda'), findsOneWidget);
+    expect(find.text('Nenhuma chegada registrada ainda'), findsWidgets);
+  });
+
+  testWidgets('shows the most recent arrival and real stat counts', (tester) async {
+    final firestore = FakeFirebaseFirestore();
+    final locationRepo = LocationRepository(firestore, 'owner-uid');
+    await locationRepo.addLocation(
+      LocationModel(name: 'Trabalho', latitude: 0, longitude: 0, radius: 100, message: 'x', icon: '🏢'),
+    );
+    final location = (await locationRepo.watchLocations().first).single;
+    await ArrivalRepository(firestore).recordArrival(
+      ownerUid: 'owner-uid',
+      locationId: location.id,
+      message: 'Cheguei!',
+    );
+
+    await tester.pumpWidget(buildApp(firestore));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Trabalho'), findsWidgets);
+    expect(find.text('Locais ativos'), findsOneWidget);
+    expect(find.text('Chegadas este mês'), findsOneWidget);
   });
 }
