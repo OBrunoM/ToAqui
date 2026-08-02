@@ -90,7 +90,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 24),
               _InviteCard(
                 onInvite: () => context.go('/contacts?openAdd=true'),
-                onJoin: () => context.go('/join'),
+                onJoin: () => context.push('/join'),
               ),
             ],
           ),
