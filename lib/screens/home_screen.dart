@@ -88,7 +88,10 @@ class HomeScreen extends ConsumerWidget {
                 linkedContacts: linkedContacts,
               ),
               const SizedBox(height: 24),
-              _InviteCard(onInvite: () => context.go('/contacts?openAdd=true')),
+              _InviteCard(
+                onInvite: () => context.go('/contacts?openAdd=true'),
+                onJoin: () => context.go('/join'),
+              ),
             ],
           ),
         ),
@@ -267,8 +270,9 @@ class _ArrivalsList extends StatelessWidget {
 
 class _InviteCard extends StatelessWidget {
   final VoidCallback onInvite;
+  final VoidCallback onJoin;
 
-  const _InviteCard({required this.onInvite});
+  const _InviteCard({required this.onInvite, required this.onJoin});
 
   @override
   Widget build(BuildContext context) {
@@ -286,7 +290,13 @@ class _InviteCard extends StatelessWidget {
             const SizedBox(height: 4),
             const Text('Eles recebem um código de convite para acompanhar suas chegadas.'),
             const SizedBox(height: 12),
-            FilledButton(onPressed: onInvite, child: const Text('Convidar')),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                FilledButton(onPressed: onInvite, child: const Text('Convidar')),
+                TextButton(onPressed: onJoin, child: const Text('Já tenho um convite')),
+              ],
+            ),
           ],
         ),
       ),
