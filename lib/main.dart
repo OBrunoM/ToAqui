@@ -54,7 +54,9 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/contacts',
-            builder: (context, state) => const ContactsScreen(),
+            builder: (context, state) => ContactsScreen(
+              autoOpenAdd: state.uri.queryParameters['openAdd'] == 'true',
+            ),
           ),
         ],
       ),
