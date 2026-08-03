@@ -5,7 +5,6 @@ describe("emergency notification payload", () => {
   let app: admin.app.App;
 
   beforeAll(() => {
-    process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
     app = admin.initializeApp({projectId: "toaqui-test-emergency"});
   });
 

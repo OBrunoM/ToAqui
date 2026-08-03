@@ -31,6 +31,24 @@ export const onArrivalCreated = onDocumentCreated(
   }
 );
 
+/**
+ * Builds the emergency notification body, appending a Google Maps link
+ * when both coordinates are available.
+ * @param {number} [latitude] - the emergency sender's latitude, if known.
+ * @param {number} [longitude] - the emergency sender's longitude, if known.
+ * @return {string} the notification body text.
+ */
+export function buildEmergencyBody(
+  latitude?: number,
+  longitude?: number
+): string {
+  const mapLink =
+    latitude !== undefined && longitude !== undefined ?
+      ` https://maps.google.com/?q=${latitude},${longitude}` :
+      "";
+  return "Uma pessoa da sua família apertou o botão de emergência." + mapLink;
+}
+
 export const onEmergencyCreated = onDocumentCreated(
   {document: "emergencies/{emergencyId}", region: "southamerica-east1"},
   async (event) => {
@@ -47,20 +65,22 @@ export const onEmergencyCreated = onDocumentCreated(
 
     if (tokens.length === 0) return;
 
-    const mapLink =
-      latitude !== undefined && longitude !== undefined ?
-        ` https://maps.google.com/?q=${latitude},${longitude}` :
-        "";
-
     await getMessaging().sendEachForMulticast({
       tokens,
       notification: {
         title: "🆘 ToAqui — Alerta de emergência",
-        body:
-          "Uma pessoa da sua família apertou o botão de emergência." +
-          mapLink,
+        body: buildEmergencyBody(latitude, longitude),
       },
       android: {priority: "high"},
+      apns: {
+        headers: {"apns-priority": "10"},
+        payload: {
+          aps: {
+            "interruption-level": "time-sensitive",
+            "sound": "default",
+          },
+        },
+      },
     });
   }
 );
