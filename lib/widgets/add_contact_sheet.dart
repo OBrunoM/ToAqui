@@ -51,6 +51,7 @@ class _AddContactSheetState extends ConsumerState<AddContactSheet> {
         ownerUid: ref.read(currentUidProvider),
         contactId: contact.id,
       );
+      await ref.read(contactRepositoryProvider).updateInviteCode(contact.id, code);
 
       if (!mounted) return;
       Navigator.of(context).pop(code);

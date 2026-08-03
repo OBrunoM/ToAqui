@@ -26,6 +26,10 @@ class ContactRepository {
     return _collection.doc(contactId).update({'linkedUid': linkedUid});
   }
 
+  Future<void> updateInviteCode(String contactId, String code) {
+    return _collection.doc(contactId).update({'inviteCode': code});
+  }
+
   Future<void> deleteContact(String id) {
     return _collection.doc(id).delete();
   }

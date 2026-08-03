@@ -51,5 +51,12 @@ void main() {
     final invites = InviteRepository(firestore);
     final result = await invites.redeemInvite(code: code, redeemerUid: 'family-uid');
     expect(result, isA<InviteRedeemSuccess>());
+
+    final contactDocs = await firestore
+        .collection('users')
+        .doc('owner-uid')
+        .collection('contacts')
+        .get();
+    expect(contactDocs.docs.single.data()['inviteCode'], code);
   });
 }

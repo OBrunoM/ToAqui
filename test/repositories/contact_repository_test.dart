@@ -31,6 +31,16 @@ void main() {
     expect(result.single.linkedUid, 'family-member-uid');
   });
 
+  test('updateInviteCode sets inviteCode on the matching document', () async {
+    final contact = ContactModel(name: 'Mãe', relationship: 'Mãe');
+    await repo.addContact(contact);
+
+    await repo.updateInviteCode(contact.id, 'ABC123');
+
+    final result = await repo.watchContacts().first;
+    expect(result.single.inviteCode, 'ABC123');
+  });
+
   test('deleteContact removes the document', () async {
     final contact = ContactModel(name: 'Mãe', relationship: 'Mãe');
     await repo.addContact(contact);
