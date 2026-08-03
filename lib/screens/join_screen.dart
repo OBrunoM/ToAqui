@@ -15,6 +15,7 @@ class JoinScreen extends ConsumerStatefulWidget {
 class _JoinScreenState extends ConsumerState<JoinScreen> {
   final _codeController = TextEditingController();
   String? _successMessage;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -23,23 +24,35 @@ class _JoinScreenState extends ConsumerState<JoinScreen> {
   }
 
   Future<void> _submit() async {
-    final invites = InviteRepository(ref.read(firestoreProvider));
-    final result = await invites.redeemInvite(
-      code: _codeController.text.trim().toUpperCase(),
-      redeemerUid: ref.read(currentUidProvider),
-    );
+    setState(() => _submitting = true);
 
-    if (!mounted) return;
+    try {
+      final invites = InviteRepository(ref.read(firestoreProvider));
+      final result = await invites.redeemInvite(
+        code: _codeController.text.trim().toUpperCase(),
+        redeemerUid: ref.read(currentUidProvider),
+      );
 
-    switch (result) {
-      case InviteRedeemSuccess():
-        setState(() => _successMessage = 'Conectado! Você vai receber os avisos de chegada.');
-      case InviteRedeemFailure(reason: final reason):
-        AppSnackbar.showError(context, switch (reason) {
-          InviteFailureReason.notFound => 'Código não encontrado. Confira e tente de novo.',
-          InviteFailureReason.expired => 'Esse código expirou. Peça um novo convite.',
-          InviteFailureReason.alreadyUsed => 'Esse código já foi usado.',
-        });
+      if (!mounted) return;
+
+      switch (result) {
+        case InviteRedeemSuccess():
+          setState(() {
+            _submitting = false;
+            _successMessage = 'Conectado! Você vai receber os avisos de chegada.';
+          });
+        case InviteRedeemFailure(reason: final reason):
+          setState(() => _submitting = false);
+          AppSnackbar.showError(context, switch (reason) {
+            InviteFailureReason.notFound => 'Código não encontrado. Confira e tente de novo.',
+            InviteFailureReason.expired => 'Esse código expirou. Peça um novo convite.',
+            InviteFailureReason.alreadyUsed => 'Esse código já foi usado.',
+          });
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      AppSnackbar.showError(context, 'Não foi possível conectar. Tente de novo.');
     }
   }
 
@@ -66,8 +79,14 @@ class _JoinScreenState extends ConsumerState<JoinScreen> {
             const SizedBox(height: 20),
             FilledButton(
               key: const Key('join-submit-button'),
-              onPressed: _submit,
-              child: const Text('Conectar'),
+              onPressed: _submitting ? null : _submit,
+              child: _submitting
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('Conectar'),
             ),
             if (_successMessage != null) ...[
               const SizedBox(height: 20),
