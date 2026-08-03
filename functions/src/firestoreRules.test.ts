@@ -6,6 +6,14 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from "@firebase/rules-unit-testing";
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
+
+// `request.time` (used by the `emergencies` create rule to require a
+// server-generated `createdAt`) is only populated for writes that actually
+// use the server-timestamp sentinel — a plain client `Date` will not satisfy
+// `createdAt == request.time`.
+const serverTimestamp = () => firebase.firestore.FieldValue.serverTimestamp();
 
 // This suite exercises `firestore.rules` directly against the Firestore
 // emulator using `@firebase/rules-unit-testing`. It is intentionally
@@ -180,6 +188,87 @@ describe("firestore.rules", () => {
       const bob = testEnv.authenticatedContext("B").firestore();
 
       await assertFails(bob.collection("arrivals").doc("arrival1").get());
+    }
+  );
+
+  it(
+    "lets a user create their own emergency doc with valid or omitted " +
+      "lat/lng, but not on behalf of someone else",
+    async () => {
+      const alice = testEnv.authenticatedContext("A").firestore();
+
+      await assertSucceeds(
+        alice.collection("emergencies").add({
+          ownerUid: "A",
+          latitude: -23.55,
+          longitude: -46.63,
+          createdAt: serverTimestamp(),
+        })
+      );
+
+      await assertSucceeds(
+        alice.collection("emergencies").add({
+          ownerUid: "A",
+          createdAt: serverTimestamp(),
+        })
+      );
+
+      const bob = testEnv.authenticatedContext("B").firestore();
+
+      await assertFails(
+        bob.collection("emergencies").add({
+          ownerUid: "A",
+          createdAt: serverTimestamp(),
+        })
+      );
+    }
+  );
+
+  it(
+    "does not let the owner read, update, or delete an emergency doc " +
+      "after creating it",
+    async () => {
+      let emergencyId = "";
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        const ref = await context.firestore().collection("emergencies").add({
+          ownerUid: "A",
+          createdAt: new Date(),
+        });
+        emergencyId = ref.id;
+      });
+
+      const alice = testEnv.authenticatedContext("A").firestore();
+      const doc = alice.collection("emergencies").doc(emergencyId);
+
+      await assertFails(doc.get());
+      await assertFails(doc.update({latitude: 1}));
+      await assertFails(doc.delete());
+    }
+  );
+
+  it(
+    "rejects an emergency create with an out-of-range or wrong-type " +
+      "latitude",
+    async () => {
+      const alice = testEnv.authenticatedContext("A").firestore();
+
+      await assertFails(
+        alice.collection("emergencies").add({
+          ownerUid: "A",
+          latitude: 200,
+          longitude: -46.63,
+          createdAt: serverTimestamp(),
+        })
+      );
+
+      await assertFails(
+        alice.collection("emergencies").add({
+          ownerUid: "A",
+          latitude: "bad",
+          longitude: -46.63,
+          createdAt: serverTimestamp(),
+        })
+      );
     }
   );
 });

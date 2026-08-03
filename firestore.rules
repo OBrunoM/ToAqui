@@ -41,7 +41,16 @@ service cloud.firestore {
     }
 
     match /emergencies/{emergencyId} {
-      allow create: if request.auth != null && request.auth.uid == request.resource.data.ownerUid;
+      allow create: if request.auth != null
+        && request.auth.uid == request.resource.data.ownerUid
+        && request.resource.data.keys().hasOnly(['ownerUid', 'latitude', 'longitude', 'createdAt'])
+        && request.resource.data.createdAt == request.time
+        && (!('latitude' in request.resource.data) ||
+            (request.resource.data.latitude is number &&
+             request.resource.data.latitude >= -90 && request.resource.data.latitude <= 90))
+        && (!('longitude' in request.resource.data) ||
+            (request.resource.data.longitude is number &&
+             request.resource.data.longitude >= -180 && request.resource.data.longitude <= 180));
     }
   }
 }
