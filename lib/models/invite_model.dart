@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class InviteModel {
   final String code;
   final String ownerUid;
@@ -19,8 +21,8 @@ class InviteModel {
     return {
       'ownerUid': ownerUid,
       'contactId': contactId,
-      'createdAt': createdAt.toIso8601String(),
-      'expiresAt': expiresAt.toIso8601String(),
+      'createdAt': Timestamp.fromDate(createdAt),
+      'expiresAt': Timestamp.fromDate(expiresAt),
       'used': used,
     };
   }
@@ -30,8 +32,8 @@ class InviteModel {
       code: code,
       ownerUid: map['ownerUid'],
       contactId: map['contactId'],
-      createdAt: DateTime.parse(map['createdAt']),
-      expiresAt: DateTime.parse(map['expiresAt']),
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      expiresAt: (map['expiresAt'] as Timestamp).toDate(),
       used: map['used'] ?? false,
     );
   }
