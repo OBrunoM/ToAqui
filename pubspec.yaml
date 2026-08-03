@@ -60,6 +60,7 @@ dev_dependencies:
   flutter_native_splash: ^2.4.8
   firebase_auth_mocks: ^0.15.2
   fake_cloud_firestore: ^4.2.0
+  geolocator_platform_interface: ^4.2.8
 
 flutter_launcher_icons:
   android: true
