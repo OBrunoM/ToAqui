@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import '../models/contact_model.dart';
 import '../providers/auth_provider.dart';
 import '../providers/firestore_provider.dart';
 import '../providers/contact_provider.dart';
@@ -58,9 +59,13 @@ class _EmergencyButtonState extends ConsumerState<EmergencyButton> with SingleTi
   }
 
   Future<void> _trigger() async {
-    final contacts = ref.read(contactsStreamProvider).value ?? [];
-    final linked = contacts.where((c) => c.linkedUid != null).toList();
-    if (linked.isEmpty) {
+    final contactsAsync = ref.read(contactsStreamProvider);
+    final recipientCountKnown = contactsAsync.hasValue;
+    final linked = contactsAsync.hasValue
+        ? contactsAsync.value!.where((c) => c.linkedUid != null).toList()
+        : const <ContactModel>[];
+
+    if (recipientCountKnown && linked.isEmpty) {
       if (!mounted) return;
       AppSnackbar.showError(
         context,
@@ -74,6 +79,11 @@ class _EmergencyButtonState extends ConsumerState<EmergencyButton> with SingleTi
     Position? position;
     try {
       position = await widget.fetchLocation();
+    } catch (_) {
+      position = null;
+    }
+
+    try {
       await EmergencyRepository(ref.read(firestoreProvider)).recordEmergency(
         ownerUid: ref.read(currentUidProvider),
         latitude: position?.latitude,
@@ -98,9 +108,13 @@ class _EmergencyButtonState extends ConsumerState<EmergencyButton> with SingleTi
       builder: (context) => AlertDialog(
         title: const Text('Alerta enviado'),
         content: Text(
-          position != null
-              ? 'Sua localização foi enviada para ${linked.length} familiar(es).'
-              : 'Alerta enviado para ${linked.length} familiar(es), sem localização.',
+          !recipientCountKnown
+              ? (position != null
+                  ? 'Sua localização foi enviada.'
+                  : 'Alerta enviado, sem localização.')
+              : (position != null
+                  ? 'Sua localização foi enviada para ${linked.length} familiar(es).'
+                  : 'Alerta enviado para ${linked.length} familiar(es), sem localização.'),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('OK')),
@@ -119,9 +133,9 @@ class _EmergencyButtonState extends ConsumerState<EmergencyButton> with SingleTi
     ref.watch(contactsStreamProvider);
 
     return GestureDetector(
-      onTapDown: (_) => _startHold(),
-      onTapUp: (_) => _cancelHold(),
-      onTapCancel: _cancelHold,
+      onLongPressDown: (_) => _startHold(),
+      onLongPressCancel: _cancelHold,
+      onLongPressUp: _cancelHold,
       child: AnimatedBuilder(
         animation: _holdController,
         builder: (context, _) {
