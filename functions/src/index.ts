@@ -7,7 +7,7 @@ import {resolveRecipientTokens} from "./resolveRecipientTokens";
 initializeApp();
 
 export const onArrivalCreated = onDocumentCreated(
-  "arrivals/{arrivalId}",
+  {document: "arrivals/{arrivalId}", region: "southamerica-east1"},
   async (event) => {
     const snap = event.data;
     if (!snap) return;
