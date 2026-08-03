@@ -1,4 +1,5 @@
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -19,5 +20,17 @@ void main() {
 
     expect(find.text('ToAqui'), findsWidgets);
     expect(find.text('Você está protegido'), findsOneWidget);
+  });
+
+  testWidgets('StartupErrorApp shows a retry button instead of a blank screen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const StartupErrorApp());
+    await tester.pumpAndSettle();
+
+    expect(
+      find.textContaining('Não foi possível conectar'),
+      findsOneWidget,
+    );
+    expect(find.widgetWithText(FilledButton, 'Tentar novamente'), findsOneWidget);
   });
 }

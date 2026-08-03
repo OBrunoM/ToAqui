@@ -18,16 +18,65 @@ import 'screens/contacts_screen.dart';
 import 'screens/add_location_screen.dart';
 import 'screens/join_screen.dart';
 
+Future<void> _bootstrap() async {
+  String? uid;
+  try {
+    uid = await AuthService(FirebaseAuth.instance).signInAnonymously();
+  } catch (_) {
+    uid = null;
+  }
+
+  if (uid == null) {
+    runApp(const StartupErrorApp());
+    return;
+  }
+
+  // Fire-and-forget: push registration (incl. the browser permission prompt
+  // on web) must never block the UI from appearing.
+  unawaited(FcmService(FirebaseFirestore.instance).registerToken(uid));
+  runApp(const ProviderScope(child: ToAquiApp()));
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  final uid = await AuthService(FirebaseAuth.instance).signInAnonymously();
-  // Fire-and-forget: push registration (incl. the browser permission prompt
-  // on web) must never block the UI from appearing.
-  unawaited(FcmService(FirebaseFirestore.instance).registerToken(uid));
-  runApp(const ProviderScope(child: ToAquiApp()));
+  await _bootstrap();
+}
+
+/// Public (not library-private) so it can be pumped directly in widget
+/// tests without requiring a full `main()`/Firebase bootstrap run.
+class StartupErrorApp extends StatelessWidget {
+  const StartupErrorApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Não foi possível conectar. Verifique sua internet e tente novamente.',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: _bootstrap,
+                  child: const Text('Tentar novamente'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
