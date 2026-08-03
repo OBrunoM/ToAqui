@@ -30,3 +30,37 @@ export const onArrivalCreated = onDocumentCreated(
     });
   }
 );
+
+export const onEmergencyCreated = onDocumentCreated(
+  {document: "emergencies/{emergencyId}", region: "southamerica-east1"},
+  async (event) => {
+    const snap = event.data;
+    if (!snap) return;
+
+    const {ownerUid, latitude, longitude} = snap.data() as {
+      ownerUid: string;
+      latitude?: number;
+      longitude?: number;
+    };
+    const db = getFirestore();
+    const tokens = await resolveRecipientTokens(db, ownerUid);
+
+    if (tokens.length === 0) return;
+
+    const mapLink =
+      latitude !== undefined && longitude !== undefined ?
+        ` https://maps.google.com/?q=${latitude},${longitude}` :
+        "";
+
+    await getMessaging().sendEachForMulticast({
+      tokens,
+      notification: {
+        title: "🆘 ToAqui — Alerta de emergência",
+        body:
+          "Uma pessoa da sua família apertou o botão de emergência." +
+          mapLink,
+      },
+      android: {priority: "high"},
+    });
+  }
+);
