@@ -19,39 +19,50 @@
 
 ---
 
-Comecei o ToAqui pensando numa coisa bem simples: por que ainda mandamos "cheguei bem" por
-mensagem de texto, na mão, todo santo dia? Quem tem alguém que se preocupa — um filho voltando
-sozinho da escola, um pai idoso morando perto, um parceiro chegando tarde do trabalho — sabe
-que esse "avisa quando chegar" vira rotina, e às vezes falha justo na hora que mais importa.
+O ToAqui nasceu de uma situação do meu dia a dia.
 
-O ToAqui automatiza esse aviso e, mais importante, dá um jeito rápido de pedir ajuda: um botão
-de emergência que funciona mesmo com a internet ruim ou sem GPS disponível, porque numa hora
-dessas o alerta não pode esperar.
+Por trabalhar e estudar longe de casa, preciso pegar a estrada diariamente. Como é natural, meus pais sempre ficam preocupados durante o trajeto e, quando eu esquecia de avisar que havia chegado ao meu destino, eles ficavam sem saber se estava tudo bem.
 
-## 📱 Conheça o ToAqui
+Foi a partir desse problema que surgiu a ideia do ToAqui: um aplicativo capaz de automatizar esse aviso.
+
+O usuário configura um destino e cadastra seus familiares ou pessoas de confiança. Quando o aplicativo identifica que o usuário chegou próximo ao local definido, uma notificação é enviada automaticamente para essas pessoas, informando que ele chegou em segurança.
+
+Além de automatizar o aviso de chegada, o ToAqui também possui um botão de emergência, pensado para permitir que o usuário peça ajuda rapidamente em situações de necessidade, inclusive em cenários onde a conexão com a internet ou o GPS esteja indisponível.
+
+O funcionamento é simples:
+
+1. O usuário define um destino.
+2. Cadastra familiares ou pessoas de confiança.
+3. O aplicativo acompanha o deslocamento.
+4. Ao chegar próximo ao destino, o ToAqui identifica a chegada.
+5. Os contatos recebem uma notificação informando que o usuário chegou.
+
+E, em uma situação de emergência, o usuário pode acionar rapidamente o botão de emergência.
+
+##  Conheça o ToAqui
 
 <table>
   <tr>
     <td align="center" width="33%">
       <img src="docs/screenshots/home.png" width="100%" alt="Home" /><br />
-      <b>🏠 Home</b><br />
+      <b> Home</b><br />
       <sub>Status de monitoramento e chegadas recentes da família</sub>
     </td>
     <td align="center" width="33%">
       <img src="docs/screenshots/localizacao.png" width="100%" alt="Localização" /><br />
-      <b>📍 Localização</b><br />
+      <b> Localização</b><br />
       <sub>Locais cadastrados, com ícone e status ativo/inativo</sub>
     </td>
     <td align="center" width="33%">
       <img src="docs/screenshots/contatos.png" width="100%" alt="Pessoas de confiança" /><br />
-      <b>👨‍👩‍👧 Pessoas de confiança</b><br />
+      <b> Pessoas de confiança</b><br />
       <sub>Abas Todos/Pendentes, prontas para os primeiros convites da família</sub>
     </td>
   </tr>
   <tr>
     <td align="center" width="33%">
       <img src="docs/screenshots/emergencia.png" width="100%" alt="Emergência" /><br />
-      <b>🚨 Emergência</b><br />
+      <b> Emergência</b><br />
       <sub>Segurar por 3 segundos envia um alerta com localização</sub>
     </td>
     <td align="center" width="33%">
@@ -61,16 +72,15 @@ dessas o alerta não pode esperar.
     </td>
     <td align="center" width="33%">
       <sub><i>(em breve — print da notificação chegando no celular)</i></sub><br />
-      <b>🔔 Notificações</b><br />
+      <b> Notificações</b><br />
       <sub>Push em tempo real quando alguém chega ou pede ajuda</sub>
     </td>
   </tr>
 </table>
 
-> 🎬 **Fluxo de convite em GIF** — criar convite → compartilhar código → pessoa entra → aparece
-> como conectado. *(em breve — ver `docs/screenshots/README.md` para como gravar)*
 
-## ⚙️ Principais funcionalidades
+
+##  Principais funcionalidades
 
 **Frontend**
 - Flutter + Dart, com gerenciamento de estado reativo (Riverpod)
@@ -83,36 +93,13 @@ dessas o alerta não pode esperar.
 - Regras de segurança do Firestore escritas por coleção, com testes dedicados
 
 **Recursos**
-- 📍 Geolocalização (cadastro de locais + simulação/registro de chegada)
-- 🔔 Notificações push em tempo real
-- 🔗 Sistema de convites (vínculo entre contas sem senha)
-- 🚨 Alertas de emergência com garantia de envio
+-  Geolocalização (cadastro de locais + simulação/registro de chegada)
+-  Notificações push em tempo real
+-  Sistema de convites (vínculo entre contas sem senha)
+-  Alertas de emergência com garantia de envio
 
-## 🔄 Como o projeto funciona
 
-```
-1. O app abre e cria uma identidade anônima automaticamente
-   (sem tela de cadastro, sem e-mail, sem senha)
-                    ↓
-2. A pessoa cadastra os locais que importam (casa, trabalho, escola)
-   e adiciona quem ela quer manter por perto (a família)
-                    ↓
-3. Pra cada pessoa adicionada, o app gera um código de convite
-   de 6 caracteres, válido por 24 horas e de uso único
-                    ↓
-4. A pessoa convidada abre o app, digita o código em
-   "Tenho um convite" e as duas contas são vinculadas no Firestore
-                    ↓
-5. A partir daí, toda chegada registrada — ou todo alerta de
-   emergência — dispara uma Cloud Function, que busca os contatos
-   vinculados e envia a notificação push pra eles
-                    ↓
-6. As regras de segurança do Firestore garantem, o tempo todo, que
-   cada pessoa só acessa os próprios dados e o que foi
-   explicitamente compartilhado com ela
-```
-
-## 🧠 Decisões técnicas
+##  Decisões técnicas
 
 **Por que Flutter?**
 Pra manter uma única base de código cobrindo Android, iOS e Web, sem abrir mão de uma
@@ -145,14 +132,7 @@ tempo único para toda a etapa de localização (incluindo a permissão do siste
 pode ficar esperando resposta indefinidamente) — se a localização não vier a tempo, o alerta
 sai mesmo assim, só que sem coordenadas.
 
-## 🧪 Testes
-
-- **Flutter**: testes de widget e de unidade cobrindo telas, providers e repositórios
-- **Cloud Functions**: testes de integração rodando contra o emulador do Firestore
-- **Regras de segurança**: suíte dedicada validando o que cada perfil de usuário pode e não
-  pode ler/escrever no banco de dados
-
-## 🚀 Como rodar o projeto
+##  Como rodar o projeto
 
 Pré-requisitos: [Flutter SDK](https://docs.flutter.dev/get-started/install), um projeto
 Firebase próprio (Auth anônimo + Firestore habilitados) e o
