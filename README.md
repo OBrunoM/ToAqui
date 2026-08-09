@@ -45,7 +45,7 @@ dessas o alerta não pode esperar.
     <td align="center" width="33%">
       <img src="docs/screenshots/contatos.png" width="100%" alt="Pessoas de confiança" /><br />
       <b>👨‍👩‍👧 Pessoas de confiança</b><br />
-      <sub>Quem está conectado e quem ainda tem convite pendente</sub>
+      <sub>Abas Todos/Pendentes, prontas para os primeiros convites da família</sub>
     </td>
   </tr>
   <tr>
@@ -60,7 +60,7 @@ dessas o alerta não pode esperar.
       <sub>Código de 6 caracteres, sem precisar de e-mail ou senha</sub>
     </td>
     <td align="center" width="33%">
-      <img src="docs/screenshots/notificacao.png" width="100%" alt="Notificações" /><br />
+      <sub><i>(em breve — print da notificação chegando no celular)</i></sub><br />
       <b>🔔 Notificações</b><br />
       <sub>Push em tempo real quando alguém chega ou pede ajuda</sub>
     </td>

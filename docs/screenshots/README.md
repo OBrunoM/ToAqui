@@ -3,14 +3,18 @@
 Salve os prints aqui, com exatamente estes nomes, que o README principal já está
 com os caminhos prontos — nenhuma edição extra necessária.
 
-| Arquivo | Tela | O que capturar |
+| Arquivo | Tela | Status |
 |---|---|---|
-| `home.png` | 🏠 Home | Tela inicial com o card de status, o botão de emergência e a lista de chegadas recentes |
-| `localizacao.png` | 📍 Localização | Lista de locais cadastrados (ativos/inativos) ou a tela de adicionar um local |
-| `contatos.png` | 👨‍👩‍👧 Pessoas de confiança | Lista de contatos, mostrando alguém conectado e alguém com convite pendente |
-| `emergencia.png` | 🚨 Emergência | O botão de SOS em destaque, se possível durante o "segurar" (com a barra de progresso visível) |
-| `convite.png` | 🔗 Convite | O código de convite gerado, ou a tela "Tenho um convite" preenchida |
-| `notificacao.png` | 🔔 Notificações | A notificação push chegando no celular (print da tela de bloqueio/central de notificações) |
+| `home.png` | 🏠 Home | ✅ |
+| `localizacao.png` | 📍 Localização | ✅ |
+| `contatos.png` | 👨‍👩‍👧 Pessoas de confiança | ✅ |
+| `emergencia.png` | 🚨 Emergência | ✅ (reaproveita o print da Home — trocar por um durante o "segurar", com a barra de progresso visível, se tirar um novo) |
+| `convite.png` | 🔗 Convite | ✅ |
+| `notificacao.png` | 🔔 Notificações | ⏳ ainda falta — print da notificação chegando no celular (tela de bloqueio/central de notificações) |
+
+Bônus salvos mas não usados no README ainda: `localizacao-mapa-bonus.png` (tela de
+adicionar local com o mapa) e `splash-bonus.png` (tela de carregamento). Dá pra
+trocar algum dos slots acima por eles se preferir — é só pedir.
 
 Para os 3-4 destaques grandes logo no topo do README, escolha as fotos que ficarem
 melhor visualmente entre essas seis — não precisa duplicar arquivos, o topo do
